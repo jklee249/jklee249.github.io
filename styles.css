@@ -36,6 +36,16 @@ h2 { font-size: clamp(2rem, 5vw, 4rem); letter-spacing: -.04em; }
 .skill-list { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 2rem; }
 .skill-list span { padding: .65rem .85rem; border: 1px solid var(--line); color: var(--muted); }
 .game-preview { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.game-shell { max-width: 34rem; margin-top: 2rem; padding: 1rem; border: 1px solid var(--line); background: var(--surface); }
+.game-toolbar, .game-actions { display: flex; align-items: center; justify-content: space-between; gap: .75rem; color: var(--muted); font-size: .85rem; }
+.game-toolbar strong { color: var(--text); }
+.game-stage { margin: 1rem 0; overflow: hidden; border: 1px solid var(--line); background: #050607; }
+#game-board { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; }
+.game-button { min-width: 2.75rem; min-height: 2.75rem; padding: .55rem .8rem; border: 1px solid var(--line); background: transparent; color: var(--text); cursor: pointer; font: inherit; }
+.game-button:hover, .game-button:focus-visible { border-color: var(--accent); color: var(--accent); }
+.game-controls { display: grid; grid-template-columns: repeat(3, 2.75rem); justify-content: center; gap: .35rem; margin-top: 1rem; }
+.game-controls .direction-button:nth-child(4) { grid-column: 1; }
+.game-note { margin: 1rem 0 0; color: var(--muted); font-size: .8rem; text-align: center; }
 .contact a { color: var(--accent); font-size: 1.25rem; }
 .site-footer { max-width: var(--max-width); margin: auto; padding: 2rem 1.5rem; color: var(--muted); font-size: .85rem; }
 

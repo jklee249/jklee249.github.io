@@ -6,6 +6,7 @@
     <meta name="description" content="jklee — 삼성전자 연구원, VR 기술 및 개발">
     <title>jklee | VR Researcher</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="game.js" defer></script>
     <script src="script.js" defer></script>
   </head>
   <body>
@@ -59,8 +60,30 @@
 
       <section class="section game-preview" id="games" aria-labelledby="games-title">
         <p class="eyebrow">04 / GAMES</p>
-        <h2 id="games-title">Playground</h2>
-        <p>게임 공간을 준비 중입니다.</p>
+        <h2 id="games-title">Snake playground</h2>
+        <p>키보드, WASD 또는 화면 버튼으로 지렁이를 움직여 보세요.</p>
+        <div class="game-shell">
+          <div class="game-toolbar" aria-live="polite">
+            <span>Score <strong id="game-score">0</strong></span>
+            <span>Best <strong id="game-high-score">0</strong></span>
+            <span id="game-status">준비됨</span>
+          </div>
+          <div class="game-stage">
+            <canvas id="game-board" width="480" height="320" aria-label="지렁이 게임 화면"></canvas>
+          </div>
+          <div class="game-actions">
+            <button class="game-button" id="game-start" type="button">시작</button>
+            <button class="game-button" id="game-pause" type="button">일시정지</button>
+            <button class="game-button" id="game-restart" type="button">재시작</button>
+          </div>
+          <div class="game-controls" aria-label="게임 방향 버튼">
+            <span></span><button class="game-button direction-button" data-direction="up" type="button" aria-label="위">↑</button><span></span>
+            <button class="game-button direction-button" data-direction="left" type="button" aria-label="왼쪽">←</button>
+            <button class="game-button direction-button" data-direction="down" type="button" aria-label="아래">↓</button>
+            <button class="game-button direction-button" data-direction="right" type="button" aria-label="오른쪽">→</button>
+          </div>
+          <p class="game-note">일반 +1 · 희귀 +3 · 보너스 +6 / 최대 길이 80칸</p>
+        </div>
       </section>
 
       <section class="section contact" id="contact" aria-labelledby="contact-title">
