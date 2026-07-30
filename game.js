@@ -2,10 +2,11 @@
   if (typeof module === 'object' && module.exports) module.exports = factory();
   else root.SnakeGame = factory().SnakeGame;
 })(typeof window === 'undefined' ? globalThis : window, function () {
-  const WIDTH = 24;
-  const HEIGHT = 16;
+  const WIDTH = 36;
+  const HEIGHT = 24;
   const INITIAL_LENGTH = 5;
   const MAX_LENGTH = 80;
+  const ITEM_COUNT = 10;
   const DIRECTIONS = {
     up: { x: 0, y: -1 },
     down: { x: 0, y: 1 },
@@ -13,9 +14,9 @@
     right: { x: 1, y: 0 }
   };
   const ITEMS = [
-    { name: 'normal', chance: 0.6, growth: 1, color: '#67b7ff' },
-    { name: 'rare', chance: 0.3, growth: 3, color: '#b98cff' },
-    { name: 'bonus', chance: 0.1, growth: 6, color: '#ffca67' }
+    { id: 'item1', name: 'Item 1', chance: 0.6, score: 1, threshold: 10, effect: 'length', color: '#67b7ff' },
+    { id: 'item2', name: 'Item 2', chance: 0.3, score: 3, threshold: 5, effect: 'length', color: '#b98cff' },
+    { id: 'item3', name: 'Item 3', chance: 0.1, score: 6, threshold: 5, effect: 'thickness', color: '#ffca67' }
   ];
 
   class SnakeGame {
@@ -34,10 +35,12 @@
       this.direction = { ...DIRECTIONS.right };
       this.nextDirection = { ...DIRECTIONS.right };
       this.targetLength = INITIAL_LENGTH;
+      this.thickness = 1;
+      this.itemCounts = { item1: 0, item2: 0, item3: 0 };
       this.score = 0;
       this.status = 'idle';
-      this.food = null;
-      this.spawnFood();
+      this.foods = [];
+      for (let index = 0; index < ITEM_COUNT; index += 1) this.spawnFood();
     }
 
     start() {
@@ -66,7 +69,8 @@
       this.direction = { ...this.nextDirection };
       const head = this.snake[0];
       const nextHead = { x: head.x + this.direction.x, y: head.y + this.direction.y };
-      const eating = this.food && nextHead.x === this.food.x && nextHead.y === this.food.y;
+      const eatingIndex = this.foods.findIndex((food) => food.x === nextHead.x && food.y === nextHead.y);
+      const eating = eatingIndex >= 0;
       const bodyToCheck = eating ? this.snake : this.snake.slice(0, -1);
       const hitWall = nextHead.x < 0 || nextHead.x >= this.width || nextHead.y < 0 || nextHead.y >= this.height;
       const hitSelf = bodyToCheck.some((part) => part.x === nextHead.x && part.y === nextHead.y);
@@ -78,8 +82,13 @@
 
       this.snake.unshift(nextHead);
       if (eating) {
-        this.score += this.food.growth;
-        this.targetLength = Math.min(MAX_LENGTH, this.targetLength + this.food.growth);
+        const item = this.foods.splice(eatingIndex, 1)[0];
+        this.score += item.score;
+        this.itemCounts[item.id] += 1;
+        if (this.itemCounts[item.id] % item.threshold === 0) {
+          if (item.effect === 'thickness') this.thickness += 1;
+          else this.targetLength = Math.min(MAX_LENGTH, this.targetLength + 1);
+        }
         this.highScore = Math.max(this.highScore, this.score);
         this.spawnFood();
       }
@@ -88,25 +97,33 @@
     }
 
     spawnFood() {
+      const occupied = new Set(this.snake.map((part) => `${part.x}:${part.y}`));
+      this.foods.forEach((food) => occupied.add(`${food.x}:${food.y}`));
       const free = [];
       for (let y = 0; y < this.height; y += 1) {
         for (let x = 0; x < this.width; x += 1) {
-          if (!this.snake.some((part) => part.x === x && part.y === y)) free.push({ x, y });
+          if (!occupied.has(`${x}:${y}`)) free.push({ x, y });
         }
       }
-      if (!free.length) {
-        this.food = null;
-        return;
-      }
+      if (!free.length) return;
       const roll = this.random();
       const type = roll < ITEMS[0].chance ? ITEMS[0] : roll < ITEMS[0].chance + ITEMS[1].chance ? ITEMS[1] : ITEMS[2];
-      this.food = { ...free[Math.floor(this.random() * free.length)], ...type };
+      this.foods.push({ ...free[Math.floor(this.random() * free.length)], ...type });
     }
 
     snapshot() {
-      return { snake: this.snake.map((part) => ({ ...part })), food: this.food && { ...this.food }, score: this.score, highScore: this.highScore, status: this.status, targetLength: this.targetLength };
+      return {
+        snake: this.snake.map((part) => ({ ...part })),
+        foods: this.foods.map((food) => ({ ...food })),
+        score: this.score,
+        highScore: this.highScore,
+        status: this.status,
+        targetLength: this.targetLength,
+        thickness: this.thickness,
+        itemCounts: { ...this.itemCounts }
+      };
     }
   }
 
-  return { SnakeGame, ITEMS, INITIAL_LENGTH, MAX_LENGTH };
+  return { SnakeGame, ITEMS, WIDTH, HEIGHT, INITIAL_LENGTH, MAX_LENGTH, ITEM_COUNT };
 });
